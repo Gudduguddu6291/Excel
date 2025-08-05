@@ -10,5 +10,4 @@ export const clerkauth = ClerkExpressRequireAuth({
     return res.status(401).json({ error: 'Unauthorized', message: err.message });
   },
 });
-
 export default clerkauth;

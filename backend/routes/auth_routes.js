@@ -5,38 +5,34 @@ const authRouter = express.Router();
 
 
 authRouter.post('/', async (req, res) => {
-  console.log("✅ Webhook endpoint hit");
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+  const { clerkUserId, email } = req.body;
 
-  const payload = req.body; // raw body
-  const headers = req.headers;
-
-  const wh = new Webhook(WEBHOOK_SECRET);
-  let evt;
+  if (!clerkUserId || !email) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
 
   try {
-    evt = wh.verify(payload, headers); // Verify signature
+    // Check if user already exists
+    const existingUser = await User.findOne({ clerkUserId });
+
+    if (!existingUser) {
+      await User.create({
+        clerkUserId,
+        email,
+        createdAt: new Date(),
+      });
+      console.log('✅ New user saved to DB');
+    } else {
+      console.log('ℹ️ User already exists');
+    }
+
+    res.status(200).json({ success: true });
   } catch (err) {
-    console.error('❌ Webhook verification failed:', err);
-    return res.status(400).send('Invalid webhook signature');
+    console.error('❌ DB Error:', err.message);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  const { type, data } = evt;
-
-  if (type === 'user.created') {
-    const clerkUserId = data.id;
-    const email = data.email_addresses?.[0]?.email_address;
-
-    await User.create({
-      clerkUserId,
-      email,
-      createdAt: new Date(),
-    });
-
-    return res.status(200).send("✅ User created and saved to DB");
-  }
-
-  res.status(200).send();
 });
+
+
 
 export default authRouter;
