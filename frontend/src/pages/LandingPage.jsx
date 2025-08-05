@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowDown, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   SignedIn,
   SignedOut,
@@ -52,7 +53,11 @@ function LandingPage() {
             whileHover={{ scale: 1.07, filter: "brightness(1.07)" }}
             whileTap={{ scale: 0.97 }}
           >
-            <SignUpButton className="text-lg px-4 py-2 rounded-md text-black font-medium bg-gradient-to-r from-green-500 to-emerald-500 hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-lg backdrop-blur-sm cursor-pointer w-full sm:w-auto text-center" />
+            <SignUpButton>
+              <span className="text-lg px-4 py-2 rounded-md text-black font-medium bg-gradient-to-r from-green-500 to-emerald-500 hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-lg backdrop-blur-sm cursor-pointer w-full sm:w-auto text-center">
+                Sign Up
+              </span>
+            </SignUpButton>
           </motion.div>
         </SignedOut>
       </div>

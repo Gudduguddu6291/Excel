@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { buttonVariants } from "./ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import {SignedIn,SignedOut,SignInButton, UserButton,} from "@clerk/clerk-react";
+import {SignIn,SignUp,SignedIn,SignedOut,SignInButton, UserButton,} from "@clerk/clerk-react";
 import {NavigationMenu,NavigationMenuList,NavigationMenuItem,navigationMenuTriggerStyle,} from "@/components/ui/navigation-menu";
 import { Menu, X } from "lucide-react";
+
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,7 +62,7 @@ function Header() {
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="" className={navigationMenuTriggerStyle()}>
+                <Link to="/dashboard" className={navigationMenuTriggerStyle()}>
                   Dashboard
                 </Link>
               </NavigationMenuItem>
@@ -77,7 +78,7 @@ function Header() {
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-2">
           <SignedOut>
-            <SignInButton>
+            <SignInButton navigate="/dashboard">
               <span className={buttonVariants() + " text-sm"}>Sign In</span>
             </SignInButton>
           </SignedOut>
@@ -88,7 +89,7 @@ function Header() {
 
         {/* Mobile: Profile Icon BESIDE Hamburger */}
         <div className="md:hidden flex items-center gap-2">
-          <SignedIn>
+          <SignedIn navigate="/dashboard">
             <UserButton />
           </SignedIn>
           <button
@@ -138,7 +139,7 @@ function Header() {
               </Link>
               <div className="flex flex-col gap-2 w-full items-center">
                 <SignedOut>
-                  <SignInButton>
+                  <SignInButton redirectUrl="/sign-in">
                     <span className={buttonVariants() + " w-full text-center"}>
                       Sign In
                     </span>
