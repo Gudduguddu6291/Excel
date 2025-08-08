@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { SignedIn } from '@clerk/clerk-react';
 import { 
   BarChart3, 
   LineChart, 
@@ -148,13 +149,13 @@ export function Features() {
                       <p className="text-muted-foreground text-lg">{feature.description}</p>
                     </div>
                     {feature.badge === "Essential Tool" ? (
-                      <div onClick={handleConvert} className='rounded-full bg-gradient-to-br from-chart-6 to-chart-5 p-2 shadow-lg flex items-center justify-center hover:cursor-pointer'>
+                      <SignedIn><div onClick={handleConvert} className='rounded-full bg-gradient-to-br from-chart-6 to-chart-5 p-2 shadow-lg flex items-center justify-center hover:cursor-pointer'>
                         <feature.icon2 className="h-6 w-6 ml-auto" />
-                      </div>
+                      </div></SignedIn>
                     ) : (
-                      <div onClick={handleGraph} className='rounded-full bg-gradient-to-br from-chart-5 to-chart-1 p-2 shadow-lg flex items-center justify-center hover:cursor-pointer'>
+                      <SignedIn><div onClick={handleGraph} className='rounded-full bg-gradient-to-br from-chart-5 to-chart-1 p-2 shadow-lg flex items-center justify-center hover:cursor-pointer'>
                         <feature.icon2 className="h-6 w-6 ml-auto" />
-                      </div>
+                      </div></SignedIn>
                     )}
                   </div>
                   <div className="space-y-3 mt-auto">
