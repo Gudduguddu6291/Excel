@@ -1,118 +1,102 @@
-import React, { useRef, useState } from "react";
-import * as XLSX from "xlsx";
-import { motion } from "framer-motion";
-export default function GraphPage() {
-  const [file, setFile] = useState(null);
-  const [data, setData] = useState(null);
-  const fileInput = useRef();
-  const handleFiles = (files) => {
-    const f = files[0];
-    if (!f) return;
-    setFile(f);
+import React, { useCallback, useState } from 'react'
+import { FileUploadSection } from '../components/FileUploadSection';
+import { FilePreview } from '../components/FilePreview';
+import { motion, AnimatePresence } from 'motion/react';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import { FileSpreadsheet, Download, RotateCcw, ChevronLeft, ChevronRight, Upload, X } from 'lucide-react';
+function GraphPage() {
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const binaryStr = e.target.result;
-      const workbook = XLSX.read(binaryStr, { type: "binary" });
-      const wsname = workbook.SheetNames[0];
-      const ws = workbook.Sheets[wsname];
-      const dataArr = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      setData(dataArr);
-    };
-    reader.readAsBinaryString(f);
-  };
-  const handleDrop = (e) => {
-    e.preventDefault();
-    handleFiles(e.dataTransfer.files);
-  };
-  const handleDragOver = (e) => e.preventDefault();
+  const handleFileUpload = useCallback((fileData) => {
+    setIsUploading(true);
+    // Simulate upload delay
+    setTimeout(() => {
+      setUploadedFile(fileData);
+      setIsUploading(false);
+    }, 1000);
+  }, []);
 
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+  };
   return (
-    <div style={{ maxWidth: 600, margin: "auto", padding: "2rem 1rem" }}>
-      <h2 style={{ textAlign: "center", fontWeight: 500, fontSize: "1.5rem" }}>
-        Upload Excel or CSV File
-      </h2>
-      <div
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        style={{
-          border: "2px dashed #1976d2",
-          borderRadius: 8,
-          padding: 32,
-          cursor: "pointer",
-          color: "#1976d2",
-          textAlign: "center",
-          fontSize: "1rem",
-          background: "#fafcff",
-          marginBottom: 32,
-          transition: "border .2s"
-        }}
-        onClick={() => fileInput.current.click()}
-      >
-        Drag & drop your file here,<br />or <span style={{ textDecoration: "underline" }}>click to choose</span>
-        <input
-          ref={fileInput}
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          style={{ display: "none" }}
-          onChange={e => handleFiles(e.target.files)}
-        />
-      </div>
-      {file && (
-        <div style={{ marginBottom: 24, textAlign: "center", color: "#555", fontSize: "0.95rem" }}>
-          <span style={{
-            display: "inline-block",
-            background: "#eef2fa",
-            borderRadius: 6,
-            padding: "6px 14px",
-            border: "1px solid #e3e7ef",
-            marginBottom: 12
-          }}>
-            {file.name}
-          </span>
-        </div>
-      )}
-      {data && (
-        <div style={{ overflowY: "auto", borderRadius: 6, border: "none", background: "#27272a" , color:"#fafafa"}}>
-          <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "0.96rem" }}>
-            <tbody>
-              {data.slice(0, 10).map((row, i) => (
-                <tr key={i} style={{ background: i === 0 ? "#27272a" : "none" }}>
-                  {row.map((cell, j) => (
-                    <td
-                      key={j}
-                      style={{
-                        border: "1px solid ",
-                        padding: "6px 12px",
-                        textAlign: "left",
-                        fontWeight: i === 0 ? 600 : 400,
-                        color: "#fafafa"
-                      }}
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-              {data.length > 10 && (
-                <tr>
-                  <td style={{ color: "#fafafa", fontSize: 13, padding: 8 }} colSpan={data[0].length}>
-                    ...and {data.length - 10} more rows
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <div className="flex justify-center w-full">
-       <motion.button
-          whileHover={{ scale: 1.07, filter: "brightness(1.07)" }}
-          whileTap={{ scale: 0.97 }}
-          className="gap-2 text-lg px-4 py-2 bg-gradient-to-br from-chart-6 to-chart-5 hover:from-chart-5 hover:to-chart-6 transition-all duration-300 shadow-lg backdrop-blur-sm cursor-pointer flex items-center rounded-md font-medium justify-center align-center mt-4"
-          
-        >Generate Graph</motion.button>
-        </div>
+    
+    <div>
+       <main className="relative min-h-[calc(100vh-88px)] flex flex-col items-center justify-center p-8">
+        <AnimatePresence mode="wait">
+          {!uploadedFile ? (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="w-full max-w-2xl"
+            >
+              <div className="text-center mb-8">
+                <h1 className="text-3xl mb-4">Upload Excel or CSV File</h1>
+              </div>
+              
+              <FileUploadSection 
+                onFileUpload={handleFileUpload}
+                isUploading={isUploading}
+              />
+              
+              <div className="flex justify-center mt-8">
+                <Button 
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg"
+                  disabled={true}
+                >
+                  Generate Graph
+                </Button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full h-full flex flex-col"
+            >
+              <FilePreview file={uploadedFile} onRemove={handleRemoveFile} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mini Upload Section - appears in corner when file is uploaded */}
+        <AnimatePresence>
+          {uploadedFile && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0, x: 100, y: 100 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+              exit={{ opacity: 0, scale: 0, x: 100, y: 100 }}
+              transition={{ delay: 0.5, type: "spring", damping: 20 }}
+              className="fixed bottom-6 right-6 z-50"
+            >
+              <Card className="p-4 bg-gray-800 border-gray-700 shadow-xl">
+                <div className="flex items-center space-x-3">
+                  <FileSpreadsheet className="w-5 h-5 text-blue-400" />
+                  <div className="text-sm">
+                    <p className="font-medium">{uploadedFile.name}</p>
+                    <p className="text-gray-400">{uploadedFile.data.length} rows</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveFile}
+                    className="text-gray-400 hover:text-white p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </div>
-  );
+  )
 }
+
+export default GraphPage;
